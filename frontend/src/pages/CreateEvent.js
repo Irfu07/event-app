@@ -5,8 +5,10 @@ import "../styles/CreateEvent.css";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-
+/*REMOVE THESE LINES
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+*/
 function CreateEvent() {
   const navigate = useNavigate();
 
