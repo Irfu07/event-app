@@ -2,12 +2,13 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/CreateEvent.css";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-import { Navigation, Pagination } from "swiper/modules";
+<Swiper navigation pagination>
+  <SwiperSlide>Slide 1</SwiperSlide>
+</Swiper>
 function CreateEvent() {
   const navigate = useNavigate();
 
