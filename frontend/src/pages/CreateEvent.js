@@ -123,11 +123,6 @@ function CreateEvent() {
           </button>
 
         </form>
-        <img
-  src={`http://localhost:5000/uploads/${event.images?.[0]}`}
-  className="event-img"
-  alt=""
-/>
       </div>
     </div>
     
