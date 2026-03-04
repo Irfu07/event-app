@@ -1,14 +1,14 @@
+//REMOVE THESE LINES
+//import { Swiper, SwiperSlide } from "swiper/react";
+//import { Navigation, Pagination } from "swiper/modules";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/CreateEvent.css";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-/*REMOVE THESE LINES
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-*/
+//import "swiper/css";
+//import "swiper/css/navigation";
+//import "swiper/css/pagination";
+
 function CreateEvent() {
   const navigate = useNavigate();
 
