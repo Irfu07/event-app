@@ -6,9 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-<Swiper navigation pagination>
-  <SwiperSlide>Slide 1</SwiperSlide>
-</Swiper>
+
 function CreateEvent() {
   const navigate = useNavigate();
 
