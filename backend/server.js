@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-
+const PORT = process.env.PORT || 5000;
 const app = express();
 
 app.use(cors());
@@ -99,4 +99,7 @@ app.put("/events/interested/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
+});
+app.listen(PORT, () => {
+  console.log("Server running");
 });
