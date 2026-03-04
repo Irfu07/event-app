@@ -2,16 +2,20 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-const PORT = process.env.PORT || 5000;
-const app = express();
+require("dotenv").config();
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+/* ================= MIDDLEWARE ================= */
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
 /* ================= DATABASE ================= */
-mongoose.connect("mongodb://127.0.0.1:27017/eventsDB")
-.then(()=>console.log("MongoDB Connected"));
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
 
 /* ================= MULTER ================= */
 const storage = multer.diskStorage({
@@ -31,7 +35,14 @@ const EventSchema = new mongoose.Schema({
   date: String,
   time: String,
   location: String,
-  images: [String]   // ⭐ multiple images
+
+  images: [String],
+
+  // ⭐ FIXED INTEREST SYSTEM
+  interestedUsers: {
+    type: [String],
+    default: []
+  }
 });
 
 const Event = mongoose.model("Event", EventSchema);
@@ -40,7 +51,8 @@ const Event = mongoose.model("Event", EventSchema);
 app.post("/events", upload.array("images", 5), async (req, res) => {
   try {
 
-    const imageNames = req.files.map(file => file.filename);
+    const imageNames =
+      req.files?.map(file => file.filename) || [];
 
     const event = new Event({
       title: req.body.title,
@@ -62,21 +74,23 @@ app.post("/events", upload.array("images", 5), async (req, res) => {
 });
 
 /* ================= GET EVENTS ================= */
+
+// Get all
+app.get("/events", async (req, res) => {
+  const events = await Event.find().sort({ _id: -1 });
+  res.json(events);
+});
+
+// Get single
 app.get("/events/:id", async (req, res) => {
   const event = await Event.findById(req.params.id);
   res.json(event);
 });
-// GET ALL EVENTS
-app.get("/events", async (req, res) => {
-  const events = await Event.find();
-  res.json(events);
-});
 
-
-app.listen(5000, () => console.log("Server running on port 5000"));
+/* ================= INTEREST TOGGLE ================= */
 app.put("/events/interested/:id", async (req, res) => {
   try {
-    const { userId } = req.body; // frontend sends user id
+    const { userId } = req.body;
 
     const event = await Event.findById(req.params.id);
 
@@ -84,11 +98,9 @@ app.put("/events/interested/:id", async (req, res) => {
       event.interestedUsers.includes(userId);
 
     if (alreadyInterested) {
-      // remove interest
       event.interestedUsers =
         event.interestedUsers.filter(id => id !== userId);
     } else {
-      // add interest
       event.interestedUsers.push(userId);
     }
 
@@ -97,9 +109,12 @@ app.put("/events/interested/:id", async (req, res) => {
     res.json(event);
 
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+/* ================= START SERVER ================= */
 app.listen(PORT, () => {
-  console.log("Server running");
+  console.log(`Server running on port ${PORT}`);
 });
