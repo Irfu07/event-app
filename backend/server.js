@@ -9,10 +9,6 @@ const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-/* ================= START SERVER ================= */
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 /* ================= MIDDLEWARE ================= */
 app.use(cors());
 app.use(express.json());
@@ -41,7 +37,7 @@ const EventSchema = new mongoose.Schema({
   date: String,
   time: String,
   location: String,
-
+  
   images: [String],
   interestedUsers: [String],
   // ⭐ FIXED INTEREST SYSTEM
@@ -56,10 +52,10 @@ const Event = mongoose.model("Event", EventSchema);
 /* ================= CREATE EVENT ================= */
 app.post("/events", upload.array("images", 5), async (req, res) => {
   try {
-
+    
     const imageNames =
-      req.files?.map(file => file.filename) || [];
-
+    req.files?.map(file => file.filename) || [];
+    
     const event = new Event({
       title: req.body.title,
       category: req.body.category,
@@ -69,10 +65,10 @@ app.post("/events", upload.array("images", 5), async (req, res) => {
       location: req.body.location,
       images: imageNames
     });
-
+    
     await event.save();
     res.json(event);
-
+    
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server error" });
@@ -99,24 +95,28 @@ app.put("/events/interested/:id", async (req, res) => {
     const { userId } = req.body;
 
     const event = await Event.findById(req.params.id);
-
+    
     const alreadyInterested =
-      event.interestedUsers.includes(userId);
-
+    event.interestedUsers.includes(userId);
+    
     if (alreadyInterested) {
       event.interestedUsers =
-        event.interestedUsers.filter(id => id !== userId);
+      event.interestedUsers.filter(id => id !== userId);
     } else {
       event.interestedUsers.push(userId);
     }
-
+    
     await event.save();
-
+    
     res.json(event);
-
+    
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
+/* ================= START SERVER ================= */
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
