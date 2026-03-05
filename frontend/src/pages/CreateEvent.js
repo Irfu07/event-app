@@ -112,12 +112,7 @@ function CreateEvent() {
           />
 
           {/* INSTAGRAM GRID PREVIEW */}
-          <div className="preview-grid">
-            {previews.map((img, i) => (
-              <img key={i} src={img} className="preview-img" alt="" />
-            ))}
-          </div>
-
+         
           <button className="btn btn-primary">
             Create Event 🚀
           </button>
