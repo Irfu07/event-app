@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import API from "../api";
 function EventDetails() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/events/${id}`)
+    axios.get(`${API}/events/${id}`)
       .then(res => setEvent(res.data));
   }, [id]);
 
@@ -21,7 +21,7 @@ function EventDetails() {
         {event.images?.map((img, i) => (
           <img
             key={i}
-            src={`http://localhost:5000/uploads/${img}`}
+            src={`${API}/uploads/${img}`}
             className="event-img"
             alt=""
           />

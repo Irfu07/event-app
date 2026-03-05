@@ -1,9 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
 import "../styles/CreateEvent.css";
 
 function CreateEvent() {
+
   const navigate = useNavigate();
 
   const [event, setEvent] = useState({
@@ -19,10 +21,14 @@ function CreateEvent() {
   const [previews, setPreviews] = useState([]);
 
   const handleChange = (e) => {
-    setEvent({ ...event, [e.target.name]: e.target.value });
+    setEvent({
+      ...event,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleImageChange = (e) => {
+
     const files = Array.from(e.target.files);
 
     setImageFiles(files);
@@ -35,31 +41,45 @@ function CreateEvent() {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
 
-    const formData = new FormData();
+    try {
 
-    Object.keys(event).forEach((key) => {
-      formData.append(key, event[key]);
-    });
+      const formData = new FormData();
 
-    imageFiles.forEach((file) => {
-      formData.append("images", file);
-    });
+      Object.keys(event).forEach((key) => {
+        formData.append(key, event[key]);
+      });
 
-    await axios.post(
-      "https://event-app-65e1.onrender.com/events",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
 
-    alert("Event Created ✅");
-    navigate("/");
+      await axios.post(`${API}/events`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      alert("Event Created ✅");
+
+      navigate("/");
+
+    } catch (error) {
+
+      console.error(error);
+      alert("Error creating event ❌");
+
+    }
   };
 
   return (
+
     <div className="container">
+
       <div className="card">
+
         <h2>Create Event</h2>
 
         <form onSubmit={handleSubmit} className="event-form">
@@ -78,11 +98,13 @@ function CreateEvent() {
             onChange={handleChange}
             required
           >
+
             <option value="">Select Category</option>
             <option>College</option>
             <option>Music</option>
             <option>Sports</option>
             <option>Festival</option>
+
           </select>
 
           <textarea
@@ -94,6 +116,7 @@ function CreateEvent() {
           />
 
           <div className="row">
+
             <input
               type="date"
               name="date"
@@ -109,6 +132,7 @@ function CreateEvent() {
               onChange={handleChange}
               required
             />
+
           </div>
 
           <input
@@ -119,7 +143,6 @@ function CreateEvent() {
             required
           />
 
-          {/* MULTIPLE IMAGE INPUT */}
           <input
             type="file"
             multiple
@@ -127,29 +150,37 @@ function CreateEvent() {
             onChange={handleImageChange}
           />
 
-          {/* IMAGE PREVIEW GRID */}
           {previews.length > 0 && (
+
             <div className="preview-grid">
-              {previews.map((img, i) =>
-                img ? (
-                  <img
-                    key={i}
-                    src={img}
-                    className="preview-img"
-                    alt={`preview-${i}`}
-                  />
-                ) : null
-              )}
+
+              {previews.map((img, i) => (
+
+                <img
+                  key={i}
+                  src={img}
+                  className="preview-img"
+                  alt="preview"
+                />
+
+              ))}
+
             </div>
+
           )}
 
           <button className="btn btn-primary">
+
             Create Event 🚀
+
           </button>
 
         </form>
+
       </div>
+
     </div>
+
   );
 }
 
