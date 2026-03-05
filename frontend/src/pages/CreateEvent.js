@@ -48,7 +48,7 @@ function CreateEvent() {
     });
 
     await axios.post(
-      "https://event-nb4w6vsem-irfu07s-projects.vercel.app/events",
+      "https://event-app-65e1.onrender.com/events",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
