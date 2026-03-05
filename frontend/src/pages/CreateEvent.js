@@ -1,13 +1,7 @@
-//REMOVE THESE LINES
-//import { Swiper, SwiperSlide } from "swiper/react";
-//import { Navigation, Pagination } from "swiper/modules";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/CreateEvent.css";
-//import "swiper/css";
-//import "swiper/css/navigation";
-//import "swiper/css/pagination";
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -33,7 +27,7 @@ function CreateEvent() {
 
     setImageFiles(files);
 
-    const previewUrls = files.map(file =>
+    const previewUrls = files.map((file) =>
       URL.createObjectURL(file)
     );
 
@@ -45,11 +39,11 @@ function CreateEvent() {
 
     const formData = new FormData();
 
-    Object.keys(event).forEach(key => {
+    Object.keys(event).forEach((key) => {
       formData.append(key, event[key]);
     });
 
-    imageFiles.forEach(file => {
+    imageFiles.forEach((file) => {
       formData.append("images", file);
     });
 
@@ -70,12 +64,20 @@ function CreateEvent() {
 
         <form onSubmit={handleSubmit} className="event-form">
 
-          <input name="title" placeholder="Title"
-            value={event.title} onChange={handleChange} required />
+          <input
+            name="title"
+            placeholder="Title"
+            value={event.title}
+            onChange={handleChange}
+            required
+          />
 
-          <select name="category"
+          <select
+            name="category"
             value={event.category}
-            onChange={handleChange} required>
+            onChange={handleChange}
+            required
+          >
             <option value="">Select Category</option>
             <option>College</option>
             <option>Music</option>
@@ -83,25 +85,39 @@ function CreateEvent() {
             <option>Festival</option>
           </select>
 
-          <textarea name="description"
+          <textarea
+            name="description"
             placeholder="Event description..."
             value={event.description}
-            onChange={handleChange} required />
+            onChange={handleChange}
+            required
+          />
 
           <div className="row">
-            <input type="date" name="date"
+            <input
+              type="date"
+              name="date"
               value={event.date}
-              onChange={handleChange} required />
+              onChange={handleChange}
+              required
+            />
 
-            <input type="time" name="time"
+            <input
+              type="time"
+              name="time"
               value={event.time}
-              onChange={handleChange} required />
+              onChange={handleChange}
+              required
+            />
           </div>
 
-          <input name="location"
+          <input
+            name="location"
             placeholder="Location"
             value={event.location}
-            onChange={handleChange} required />
+            onChange={handleChange}
+            required
+          />
 
           {/* MULTIPLE IMAGE INPUT */}
           <input
@@ -111,8 +127,22 @@ function CreateEvent() {
             onChange={handleImageChange}
           />
 
-          {/* INSTAGRAM GRID PREVIEW */}
-         
+          {/* IMAGE PREVIEW GRID */}
+          {previews.length > 0 && (
+            <div className="preview-grid">
+              {previews.map((img, i) =>
+                img ? (
+                  <img
+                    key={i}
+                    src={img}
+                    className="preview-img"
+                    alt={`preview-${i}`}
+                  />
+                ) : null
+              )}
+            </div>
+          )}
+
           <button className="btn btn-primary">
             Create Event 🚀
           </button>
@@ -120,7 +150,6 @@ function CreateEvent() {
         </form>
       </div>
     </div>
-    
   );
 }
 
