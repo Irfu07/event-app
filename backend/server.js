@@ -9,7 +9,10 @@ const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+/* ================= START SERVER ================= */
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 /* ================= MIDDLEWARE ================= */
 app.use(cors());
 app.use(express.json());
@@ -40,7 +43,7 @@ const EventSchema = new mongoose.Schema({
   location: String,
 
   images: [String],
-
+  interestedUsers: [String],
   // ⭐ FIXED INTEREST SYSTEM
   interestedUsers: {
     type: [String],
@@ -117,7 +120,3 @@ app.put("/events/interested/:id", async (req, res) => {
   }
 });
 
-/* ================= START SERVER ================= */
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
