@@ -48,7 +48,7 @@ function CreateEvent() {
     });
 
     await axios.post(
-      "http://localhost:5000/events",
+      "https://event-nb4w6vsem-irfu07s-projects.vercel.app/events",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
