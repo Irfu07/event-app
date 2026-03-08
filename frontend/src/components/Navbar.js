@@ -3,11 +3,17 @@ import { useState } from "react";
 import "./Navbar.css";
 
 function Navbar() {
+
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
+
       {/* LOGO */}
       <h2 className="logo">🎉 Nearby Events</h2>
 
@@ -21,8 +27,10 @@ function Navbar() {
 
       {/* NAV LINKS */}
       <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+
         <Link
           to="/"
+          onClick={closeMenu}
           className={`nav-btn ${
             location.pathname === "/" ? "active" : ""
           }`}
@@ -32,13 +40,16 @@ function Navbar() {
 
         <Link
           to="/create"
+          onClick={closeMenu}
           className={`nav-btn create ${
             location.pathname === "/create" ? "active" : ""
           }`}
         >
           Create Event
         </Link>
+
       </div>
+
     </nav>
   );
 }
