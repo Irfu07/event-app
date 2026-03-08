@@ -1,14 +1,15 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import API from "../api";
+
 function EventDetails() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/events")
-      .then(res => setEvent(res.data));
+    axios.get(`http://localhost:5000/events/${id}`)
+      .then(res => setEvent(res.data))
+      .catch(err => console.log(err));
   }, [id]);
 
   if (!event) return <h2>Loading...</h2>;
@@ -23,7 +24,7 @@ function EventDetails() {
             key={i}
             src={`http://localhost:5000/uploads/${img}`}
             className="event-img"
-            alt=""
+            alt={`event-${i}`}
           />
         ))}
       </div>
