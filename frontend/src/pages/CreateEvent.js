@@ -56,7 +56,7 @@ function CreateEvent() {
         formData.append("images", file);
       });
 
-      await axios.post(`${API}/events`, formData, {
+      await axios.post(`http://localhost:5000/events`, formData, {
         headers: {
           "Content-Type": "multipart/form-data"
         }

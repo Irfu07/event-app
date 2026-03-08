@@ -6,7 +6,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
-import API from "../api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ function Dashboard() {
   /* ================= FETCH EVENTS ================= */
   const fetchEvents = async () => {
     try {
-      const res = await axios.get(`${API}/events`);
+      const res = await axios.get("http://localhost:5000/events");
       setEvents(res.data);
     } catch (err) {
       console.log(err);
@@ -40,7 +39,7 @@ function Dashboard() {
 
     if (!confirmDelete) return;
 
-    await axios.delete(`${API}/events/${id}`);
+    await axios.delete(`http://localhost:5000/events/${id}`);
     fetchEvents();
   };
 
@@ -49,7 +48,10 @@ function Dashboard() {
     try {
       setLoadingId(id);
 
-      const res = await axios.put(`${API}/events/interested/${id}`, { userId });
+      const res = await axios.put(
+        `http://localhost:5000/events/interested/${id}`,
+        { userId }
+      );
 
       // update only clicked event
       setEvents((prev) =>
@@ -123,7 +125,7 @@ function Dashboard() {
                   {event.images.map((img, i) => (
                     <SwiperSlide key={i}>
                       <img
-                        src={`${API}/uploads/${img}`}
+                        src={`http://localhost:5000/uploads/${img}`}
                         alt="event"
                         className="event-img"
                       />

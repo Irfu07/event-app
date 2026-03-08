@@ -7,7 +7,7 @@ function EventDetails() {
   const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API}/events/${id}`)
+    axios.get("http://localhost:5000/events")
       .then(res => setEvent(res.data));
   }, [id]);
 
@@ -21,7 +21,7 @@ function EventDetails() {
         {event.images?.map((img, i) => (
           <img
             key={i}
-            src={`${API}/uploads/${img}`}
+            src={`http://localhost:5000/uploads/${img}`}
             className="event-img"
             alt=""
           />
