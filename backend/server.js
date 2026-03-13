@@ -37,6 +37,21 @@ cb(null,Date.now()+path.extname(file.originalname));
 });
 
 const upload = multer({storage});
+/* LOGIN ROUTE */
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  
+  // High-level logic (Replace with real database check later)
+  if (email && password) {
+    res.json({ 
+      id: "123", 
+      email: email, 
+      token: "fake-jwt-token" 
+    });
+  } else {
+    res.status(400).json({ message: "Email and password required" });
+  }
+});
 
 /* CREATE EVENT */
 
