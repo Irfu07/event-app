@@ -3,26 +3,54 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    email: "",
+    password: ""
+  });
+
   const navigate = useNavigate();
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
   const login = async () => {
-    const res = await axios.post("http://localhost:5000/login", data);
-    localStorage.setItem("user", JSON.stringify(res.data));
-    navigate("/");
+    try {
+      const res = await axios.post("http://localhost:5000/login", data);
+
+      localStorage.setItem("token", res.data.token);
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+      console.error(err);
+    }
   };
 
   return (
     <div className="container">
-      <div className="card">
+      <div className="card" style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
         <h2>Login</h2>
-        <input name="email" placeholder="Email" onChange={handleChange} />
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-        <button className="btn btn-primary" onClick={login}>Login</button>
+
+        <input
+          name="email"
+          placeholder="Email"
+          value={data.email}
+          onChange={handleChange}
+          className="form-control mb-2"
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={data.password}
+          onChange={handleChange}
+          className="form-control mb-2"
+        />
+
+        <button className="btn btn-primary w-100" onClick={login}>
+          Login
+        </button>
       </div>
     </div>
   );

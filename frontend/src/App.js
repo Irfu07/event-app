@@ -1,41 +1,78 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+import Navbar from "./components/Navbar";
+import SelectRole from "./pages/SelectRole";
+import Auth from "./pages/auth";
 import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import EventDetails from "./pages/EventDetails";
-import Navbar from "./components/Navbar";
+import CreatorProfile from "./pages/CreatorProfile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
-function App() {
-  return (
-    <Router>
-      {/* GLOBAL APP BACKGROUND */}
-      <div className="app-background">
+function App(){
 
-        {/* Navbar always visible */}
-        <Navbar />
+const [token,setToken] = useState(null);
 
-        {/* Pages */}
-        <div className="page-container">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/create" element={<CreateEvent />} />
-            <Route path="/event/:id" element={<EventDetails />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </div>
+useEffect(()=>{
+setToken(localStorage.getItem("token"));
+},[]);
 
-        {/* Toast Messages */}
-        <ToastContainer position="top-right" autoClose={2000} />
-      </div>
-      
-    </Router>
-    
-  );
+return(
+
+<Router>
+
+<div className="app-background">
+
+<Navbar/>
+
+<div className="page-container">
+
+<Routes>
+
+<Route path="/" element={<SelectRole/>} />
+
+<Route path="/auth" element={<Auth/>} />
+<Route path="/forgot-password" element={<ForgotPassword/>} />
+
+<Route path="/reset-password/:token" element={<ResetPassword/>} />
+<Route
+path="/dashboard"
+element={token ? <Dashboard/> : <Navigate to="/auth"/>}
+/>
+
+<Route
+path="/create"
+element={token ? <CreateEvent/> : <Navigate to="/auth"/>}
+/>
+
+<Route
+path="/event/:id"
+element={token ? <EventDetails/> : <Navigate to="/auth"/>}
+/>
+
+<Route
+path="/creator/:id"
+element={token ? <CreatorProfile/> : <Navigate to="/auth"/>}
+/>
+
+</Routes>
+
+</div>
+
+<ToastContainer position="top-right" autoClose={2000} />
+
+</div>
+
+</Router>
+
+);
+
 }
 
 export default App;

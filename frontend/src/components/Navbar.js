@@ -1,57 +1,52 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
-import "./Navbar.css";
+import { Link, useNavigate } from "react-router-dom";
 
-function Navbar() {
+function Navbar(){
 
-  const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+const navigate = useNavigate();
 
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
 
-  return (
-    <nav className="navbar">
+const logout = ()=>{
 
-      {/* LOGO */}
-      <h2 className="logo">🎉 Nearby Events</h2>
+localStorage.clear();
 
-      {/* MOBILE MENU ICON */}
-      <div
-        className="menu-toggle"
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        ☰
-      </div>
+navigate("/auth");
 
-      {/* NAV LINKS */}
-      <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+};
 
-        <Link
-          to="/"
-          onClick={closeMenu}
-          className={`nav-btn ${
-            location.pathname === "/" ? "active" : ""
-          }`}
-        >
-          Home
-        </Link>
+return(
 
-        <Link
-          to="/create"
-          onClick={closeMenu}
-          className={`nav-btn create ${
-            location.pathname === "/create" ? "active" : ""
-          }`}
-        >
-          Create Event
-        </Link>
+<nav className="navbar">
 
-      </div>
+<h2 className="logo">Nearby Events</h2>
 
-    </nav>
-  );
+{/* SHOW MENU ONLY AFTER LOGIN */}
+
+{token && (
+
+<div className="nav-links">
+
+<Link to="/dashboard">Home</Link>
+
+{(role==="creator" || role==="admin") && (
+
+<Link to="/create">Create Event</Link>
+
+)}
+
+<button className="logout-btn" onClick={logout}>
+Logout
+</button>
+
+</div>
+
+)}
+
+</nav>
+
+);
+
 }
 
 export default Navbar;

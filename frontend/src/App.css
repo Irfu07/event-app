@@ -102,3 +102,60 @@ input, select, textarea {
   display: flex;
   gap: 10px;
 }
+.creator-badge{
+background:#4caf50;
+color:white;
+padding:4px 10px;
+border-radius:6px;
+font-size:12px;
+margin-bottom:6px;
+display:inline-block;
+}
+
+.admin-badge{
+background:#ff5722;
+color:white;
+padding:4px 10px;
+border-radius:6px;
+font-size:12px;
+margin-bottom:6px;
+display:inline-block;
+}
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 30px;
+background:#111;
+color:white;
+}
+
+.logo{
+font-size:20px;
+font-weight:bold;
+}
+
+.nav-links{
+display:flex;
+gap:20px;
+align-items:center;
+}
+
+.nav-links a{
+color:white;
+text-decoration:none;
+font-weight:500;
+}
+
+.logout-btn{
+background:#ff4444;
+border:none;
+padding:8px 14px;
+color:white;
+cursor:pointer;
+border-radius:5px;
+}
+
+.logout-btn:hover{
+background:#cc0000;
+}

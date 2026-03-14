@@ -1,12 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import API from "../api";
 import "../styles/CreateEvent.css";
 
 function CreateEvent() {
 
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
   const [event, setEvent] = useState({
     title: "",
@@ -20,12 +22,18 @@ function CreateEvent() {
   const [imageFiles, setImageFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
 
+  /* ================= INPUT CHANGE ================= */
+
   const handleChange = (e) => {
+
     setEvent({
       ...event,
       [e.target.name]: e.target.value
     });
+
   };
+
+  /* ================= IMAGE PREVIEW ================= */
 
   const handleImageChange = (e) => {
 
@@ -38,11 +46,21 @@ function CreateEvent() {
     );
 
     setPreviews(previewUrls);
+
   };
+
+  /* ================= CREATE EVENT ================= */
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
+
+    // Token check
+    if (!token) {
+      alert("Please login first");
+      navigate("/login");
+      return;
+    }
 
     try {
 
@@ -56,15 +74,20 @@ function CreateEvent() {
         formData.append("images", file);
       });
 
-      await axios.post(`http://localhost:5000/events`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
+      await axios.post(
+        "http://localhost:5000/events",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
         }
-      });
+      );
 
-      alert("Event Created ✅");
+      alert("Event Created Successfully 🎉");
 
-      navigate("/");
+      navigate("/dashboard");
 
     } catch (error) {
 
@@ -72,7 +95,24 @@ function CreateEvent() {
       alert("Error creating event ❌");
 
     }
+
   };
+
+  /* ================= ROLE PROTECTION ================= */
+
+  if (role !== "creator" && role !== "admin") {
+
+    return (
+      <div className="container">
+        <h2 style={{ textAlign: "center" }}>
+          ❌ Only Creator or Admin can create events
+        </h2>
+      </div>
+    );
+
+  }
+
+  /* ================= UI ================= */
 
   return (
 
@@ -170,9 +210,7 @@ function CreateEvent() {
           )}
 
           <button className="btn btn-primary">
-
             Create Event 🚀
-
           </button>
 
         </form>
@@ -182,6 +220,7 @@ function CreateEvent() {
     </div>
 
   );
+
 }
 
 export default CreateEvent;
