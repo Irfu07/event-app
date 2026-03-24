@@ -49,7 +49,7 @@ const deleteEvent = async(id)=>{
 if(!window.confirm("Delete this event?")) return;
 
 await axios.delete(`http://localhost:5000/events/${id}`,{
-headers:{Authorization:token}
+  headers:{Authorization:`Bearer ${token}`}
 });
 
 fetchEvents();
@@ -68,7 +68,7 @@ const res = await axios.put(
 `http://localhost:5000/events/interested/${id}`,
 {},
 {
-headers:{Authorization:token}
+headers:{Authorization:`Bearer ${token}`}
 }
 );
 

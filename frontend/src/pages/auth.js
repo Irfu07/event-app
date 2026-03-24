@@ -3,11 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./auth.css";
 
-function Auth() {
+function Auth({ setToken }) {
 
   const navigate = useNavigate();
 
   const [type, setType] = useState("login");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [data, setData] = useState({
     name: "",
@@ -47,12 +48,12 @@ function Auth() {
 
       /* ===== LOGIN SUCCESS ===== */
       if (type === "login") {
-
-        // ✅ Save JWT token + user info
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("role", res.data.role);
         localStorage.setItem("userId", res.data.userId);
         localStorage.setItem("name", res.data.name);
+
+        setToken(res.data.token);
 
         navigate("/dashboard");
       }
@@ -106,14 +107,32 @@ function Auth() {
           required
         />
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={data.password}
-          onChange={handleChange}
-          required
-        />
+        {/* PASSWORD WITH SHOW/HIDE */}
+        <div style={{ position: "relative" }}>
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={data.password}
+            onChange={handleChange}
+            required
+            style={{ paddingRight: "42px", width: "100%" }}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "12px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "18px",
+              userSelect: "none"
+            }}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
         {type === "register" && (
           <select

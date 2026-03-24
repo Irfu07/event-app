@@ -180,18 +180,21 @@ app.post("/events", auth, upload.array("images", 5), async (req, res) => {
     const imageNames = req.files.map((file) => file.filename);
 
     const event = new Event({
-      title: req.body.title,
-      description: req.body.description,
-      category: req.body.category,
-      date: req.body.date,
-      time: req.body.time,
-      location: req.body.location,
-      images: imageNames,
-      creatorId: req.user.id,
-      creatorRole: req.user.role,
-      creatorName: req.user.name, // ✅ now available from JWT
-      interestedUsers: [],
-    });
+  title: req.body.title,
+  description: req.body.description,
+  category: req.body.category,
+  date: req.body.date,
+  time: req.body.time,
+  location: req.body.location,
+  hostedBy: req.body.hostedBy,   // ✅ ADD THIS
+  lat: req.body.lat,             // ✅ ADD THIS
+  lng: req.body.lng,             // ✅ ADD THIS
+  images: imageNames,
+  creatorId: req.user.id,
+  creatorRole: req.user.role,
+  creatorName: req.user.name,
+  interestedUsers: [],
+});
 
     await event.save();
 

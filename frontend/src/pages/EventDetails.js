@@ -1,59 +1,98 @@
-import { useParams } from "react-router-dom";
-import { useEffect,useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
-function EventDetails(){
+function EventDetails() {
 
-const {id} = useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-const [event,setEvent] = useState(null);
+  const [event, setEvent] = useState(null);
 
-useEffect(()=>{
+  useEffect(() => {
+    axios.get(`http://localhost:5000/events/${id}`)
+      .then(res => setEvent(res.data))
+      .catch(err => console.log(err));
+  }, [id]);
 
-axios.get(`http://localhost:5000/events/${id}`)
-.then(res=>setEvent(res.data))
-.catch(err=>console.log(err));
+  if (!event) return <h2>Loading...</h2>;
 
-},[id]);
+  return (
+    <div className="details-container">
 
-if(!event) return <h2>Loading...</h2>;
+      {/* IMAGE GALLERY */}
+      <div className="image-gallery">
+        {event.images?.map((img, i) => (
+          <img
+            key={i}
+            src={`http://localhost:5000/uploads/${img}`}
+            className="event-img"
+            alt="event"
+          />
+        ))}
+      </div>
 
-return(
+      {/* TITLE */}
+      <h1>{event.title}</h1>
 
-<div className="details-container">
+      {/* HOSTED BY */}
+      <p>
+        <b>Hosted By:</b> {event.hostedBy || "Not specified"}
+      </p>
 
-<div className="image-gallery">
+      {/* DESCRIPTION */}
+      <p>{event.description}</p>
 
-{event.images?.map((img,i)=>(
+      {/* CATEGORY */}
+      <p><b>Category:</b> {event.category}</p>
 
-<img
-key={i}
-src={`http://localhost:5000/uploads/${img}`}
-className="event-img"
-alt="event"
-/>
+      {/* DATE */}
+      <p>
+        <b>Date:</b> {new Date(event.date).toLocaleDateString()}
+      </p>
 
-))}
+      {/* TIME */}
+      <p><b>Time:</b> {event.time}</p>
 
-</div>
+      {/* LOCATION */}
+      <p><b>Location:</b> {event.location}</p>
 
-<h1>{event.title}</h1>
+      {/* GOOGLE MAPS BUTTON */}
+      {event.lat && event.lng && (
+        <a
+          href={`https://www.google.com/maps?q=${event.lat},${event.lng}`}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: "inline-block",
+            marginTop: "8px",
+            padding: "10px 20px",
+            background: "#4285F4",
+            color: "white",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: "bold"
+          }}
+        >
+          🗺️ Open in Google Maps
+        </a>
+      )}
 
-<p>{event.description}</p>
+      {/* INTERESTED COUNT */}
+      <p style={{ marginTop: "12px" }}>
+        <b>⭐ Interested:</b> {event.interestedUsers?.length || 0} people
+      </p>
 
-<p>
-<b>Date:</b>
-{new Date(event.date).toLocaleDateString()}
-</p>
+      {/* CREATOR */}
+      <p
+        style={{ cursor: "pointer", color: "#6c63ff", marginTop: "8px" }}
+        onClick={() => navigate(`/creator/${event.creatorId}`)}
+      >
+        <b>Creator:</b> {event.creatorName || "Organizer"}
+      </p>
 
-<p><b>Time:</b> {event.time}</p>
-
-<p><b>Location:</b> {event.location}</p>
-
-</div>
-
-);
-
+    </div>
+  );
 }
 
 export default EventDetails;

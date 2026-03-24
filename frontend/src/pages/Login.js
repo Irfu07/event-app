@@ -8,6 +8,8 @@ function Login() {
     password: ""
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -39,14 +41,32 @@ function Login() {
           className="form-control mb-2"
         />
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={data.password}
-          onChange={handleChange}
-          className="form-control mb-2"
-        />
+        {/* PASSWORD WITH SHOW/HIDE */}
+        <div style={{ position: "relative", marginBottom: "8px" }}>
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={data.password}
+            onChange={handleChange}
+            className="form-control"
+            style={{ paddingRight: "42px", width: "100%" }}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "12px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "18px",
+              userSelect: "none"
+            }}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
         <button className="btn btn-primary w-100" onClick={login}>
           Login

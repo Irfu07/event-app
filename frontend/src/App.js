@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import Navbar from "./components/Navbar";
 import SelectRole from "./pages/SelectRole";
@@ -17,11 +17,7 @@ import "./App.css";
 
 function App(){
 
-const [token,setToken] = useState(null);
-
-useEffect(()=>{
-setToken(localStorage.getItem("token"));
-},[]);
+const [token, setToken] = useState(localStorage.getItem("token"));
 
 return(
 
@@ -37,7 +33,7 @@ return(
 
 <Route path="/" element={<SelectRole/>} />
 
-<Route path="/auth" element={<Auth/>} />
+<Route path="/auth" element={<Auth setToken={setToken}/>} />
 <Route path="/forgot-password" element={<ForgotPassword/>} />
 
 <Route path="/reset-password/:token" element={<ResetPassword/>} />
