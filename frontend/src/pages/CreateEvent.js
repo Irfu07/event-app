@@ -25,45 +25,34 @@ function CreateEvent() {
   /* ================= INPUT CHANGE ================= */
 
   const handleChange = (e) => {
-
     setEvent({
       ...event,
       [e.target.name]: e.target.value
     });
-
   };
 
   /* ================= IMAGE PREVIEW ================= */
 
   const handleImageChange = (e) => {
-
     const files = Array.from(e.target.files);
-
     setImageFiles(files);
 
-    const previewUrls = files.map((file) =>
-      URL.createObjectURL(file)
-    );
-
+    const previewUrls = files.map((file) => URL.createObjectURL(file));
     setPreviews(previewUrls);
-
   };
 
   /* ================= CREATE EVENT ================= */
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
-    // Token check
     if (!token) {
       alert("Please login first");
-      navigate("/login");
+      navigate("/auth");
       return;
     }
 
     try {
-
       const formData = new FormData();
 
       Object.keys(event).forEach((key) => {
@@ -79,29 +68,26 @@ function CreateEvent() {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
-          }
+            Authorization: `Bearer ${token}`, // ✅ JWT token sent correctly
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       alert("Event Created Successfully 🎉");
-
       navigate("/dashboard");
 
     } catch (error) {
-
       console.error(error);
-      alert("Error creating event ❌");
-
+      alert(
+        error.response?.data?.message || "Error creating event ❌"
+      );
     }
-
   };
 
   /* ================= ROLE PROTECTION ================= */
 
   if (role !== "creator" && role !== "admin") {
-
     return (
       <div className="container">
         <h2 style={{ textAlign: "center" }}>
@@ -109,17 +95,13 @@ function CreateEvent() {
         </h2>
       </div>
     );
-
   }
 
   /* ================= UI ================= */
 
   return (
-
     <div className="container">
-
       <div className="card">
-
         <h2>Create Event</h2>
 
         <form onSubmit={handleSubmit} className="event-form">
@@ -138,13 +120,11 @@ function CreateEvent() {
             onChange={handleChange}
             required
           >
-
             <option value="">Select Category</option>
             <option>College</option>
             <option>Music</option>
             <option>Sports</option>
             <option>Festival</option>
-
           </select>
 
           <textarea
@@ -156,7 +136,6 @@ function CreateEvent() {
           />
 
           <div className="row">
-
             <input
               type="date"
               name="date"
@@ -172,7 +151,6 @@ function CreateEvent() {
               onChange={handleChange}
               required
             />
-
           </div>
 
           <input
@@ -191,22 +169,16 @@ function CreateEvent() {
           />
 
           {previews.length > 0 && (
-
             <div className="preview-grid">
-
               {previews.map((img, i) => (
-
                 <img
                   key={i}
                   src={img}
                   className="preview-img"
                   alt="preview"
                 />
-
               ))}
-
             </div>
-
           )}
 
           <button className="btn btn-primary">
@@ -214,13 +186,9 @@ function CreateEvent() {
           </button>
 
         </form>
-
       </div>
-
     </div>
-
   );
-
 }
 
 export default CreateEvent;
