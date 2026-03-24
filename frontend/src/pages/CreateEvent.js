@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import '.styles/CreateEvent.css';
 
 // Fix leaflet default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
