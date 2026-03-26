@@ -4,17 +4,35 @@ const eventSchema = new mongoose.Schema({
   title: String,
   description: String,
   category: String,
-  date: Date,
+  date: String,
   time: String,
   location: String,
   hostedBy: String,
-  lat: String,
-  lng: String,
+
   images: [String],
-  creatorId: String,
-  creatorRole: String,
-  creatorName: String,
-  interestedUsers: [String]
+
+  creatorId: {
+    type: String,
+    required: true,
+  },
+
+  creatorRole: {
+    type: String,
+    enum: ["admin", "creator", "user"],
+    default: "creator",
+  },
+
+  creatorName: {
+    type: String,
+  },
+
+  interestedUsers: {
+    type: [String],
+    default: [],
+  },
+
+  lat: Number,
+  lng: Number,
 });
 
 module.exports = mongoose.model("Event", eventSchema);

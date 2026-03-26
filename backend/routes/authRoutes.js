@@ -1,41 +1,41 @@
 const router = require("express").Router();
-const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
-router.post("/", async(req,res)=>{
+// Create ONLY one admin (hardcoded)
+router.post("/create-admin", async (req, res) => {
+  const admin = await User.findOne({ email: "irfu1605@gmail.com" });
+  if (admin) return res.json({ message: "Admin already exists" });
 
-const {name,email,password,role,type} = req.body;
+  const newAdmin = new User({
+    name: "Admin",
+    email: "irfu1605@gmail.com",
+    password: "Irfu1605",
+    role: "admin"
+  });
 
-let user = await User.findOne({email});
+  await newAdmin.save();
+  res.json(newAdmin);
+});
 
-if(type==="register"){
+// LOGIN
+router.post("/login", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
 
-if(user){
-return res.status(400).json({message:"User already exists"});
-}
+  if (!user || user.password !== req.body.password)
+    return res.status(400).json({ message: "Invalid credentials" });
 
-user = new User({name,email,password,role});
-await user.save();
+  const token = jwt.sign(
+    {
+      id: user._id,
+      name: user.name,
+      role: user.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
 
-return res.json({message:"Registered"});
-}
-
-if(type==="login"){
-
-if(!user || user.password!==password){
-return res.status(400).json({message:"Invalid credentials"});
-}
-
-const token = jwt.sign(
-{id:user._id,role:user.role},
-"secret123",
-{expiresIn:"1d"}
-);
-
-res.json({token,role:user.role});
-
-}
-
+  res.json({ token, user });
 });
 
 module.exports = router;

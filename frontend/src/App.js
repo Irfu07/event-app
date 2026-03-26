@@ -6,6 +6,7 @@ import SelectRole from "./pages/SelectRole";
 import Auth from "./pages/auth";
 import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
+import EditEvent from "./pages/Editevent";
 import EventDetails from "./pages/EventDetails";
 import CreatorProfile from "./pages/CreatorProfile";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -15,60 +16,58 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
-function App(){
+function App() {
 
-const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
-return(
+  return (
+    <Router>
+      <div className="app-background">
 
-<Router>
+        <Navbar />
 
-<div className="app-background">
+        <div className="page-container">
+          <Routes>
 
-<Navbar/>
+            <Route path="/" element={<SelectRole />} />
+            <Route path="/auth" element={<Auth setToken={setToken} />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-<div className="page-container">
+            <Route
+              path="/dashboard"
+              element={token ? <Dashboard /> : <Navigate to="/auth" />}
+            />
 
-<Routes>
+            <Route
+              path="/create"
+              element={token ? <CreateEvent /> : <Navigate to="/auth" />}
+            />
 
-<Route path="/" element={<SelectRole/>} />
+            {/* ✅ EDIT EVENT ROUTE */}
+            <Route
+              path="/edit/:id"
+              element={token ? <EditEvent /> : <Navigate to="/auth" />}
+            />
 
-<Route path="/auth" element={<Auth setToken={setToken}/>} />
-<Route path="/forgot-password" element={<ForgotPassword/>} />
+            <Route
+              path="/event/:id"
+              element={token ? <EventDetails /> : <Navigate to="/auth" />}
+            />
 
-<Route path="/reset-password/:token" element={<ResetPassword/>} />
-<Route
-path="/dashboard"
-element={token ? <Dashboard/> : <Navigate to="/auth"/>}
-/>
+            <Route
+              path="/creator/:id"
+              element={token ? <CreatorProfile /> : <Navigate to="/auth" />}
+            />
 
-<Route
-path="/create"
-element={token ? <CreateEvent/> : <Navigate to="/auth"/>}
-/>
+          </Routes>
+        </div>
 
-<Route
-path="/event/:id"
-element={token ? <EventDetails/> : <Navigate to="/auth"/>}
-/>
+        <ToastContainer position="top-right" autoClose={2000} />
 
-<Route
-path="/creator/:id"
-element={token ? <CreatorProfile/> : <Navigate to="/auth"/>}
-/>
-
-</Routes>
-
-</div>
-
-<ToastContainer position="top-right" autoClose={2000} />
-
-</div>
-
-</Router>
-
-);
-
+      </div>
+    </Router>
+  );
 }
 
 export default App;

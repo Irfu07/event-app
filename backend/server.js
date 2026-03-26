@@ -74,14 +74,13 @@ function auth(req, res, next) {
     return res.status(401).json({ message: "Access denied" });
   }
 
-  // Support both "Bearer <token>" and raw token
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice(7)
     : authHeader;
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // { id, role, name }
+    req.user = decoded;
     next();
   } catch {
     res.status(401).json({ message: "Invalid token" });
@@ -93,8 +92,6 @@ function auth(req, res, next) {
 ================================================================== */
 
 app.post("/auth", async (req, res) => {
-  console.log("AUTH REQUEST:", req.body);
-
   const { name, email, password, role, type } = req.body;
 
   let user = await User.findOne({ email });
@@ -103,13 +100,7 @@ app.post("/auth", async (req, res) => {
   if (type === "register") {
     if (user) return res.status(400).json({ message: "User already exists" });
 
-    user = new User({
-      name,
-      email,
-      password,
-      role,
-    });
-
+    user = new User({ name, email, password, role });
     await user.save();
     return res.json({ message: "Registered successfully" });
   }
@@ -121,7 +112,6 @@ app.post("/auth", async (req, res) => {
     if (user.password !== password)
       return res.status(400).json({ message: "Invalid password" });
 
-    // ✅ Generate JWT with id, role, and name
     const token = jwt.sign(
       { id: user._id, role: user.role, name: user.name },
       JWT_SECRET,
@@ -158,52 +148,119 @@ app.get("/events", async (req, res) => {
 app.get("/events/:id", async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-
     if (!event) return res.status(404).json({ message: "Event not found" });
-
     res.json(event);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-
 /* ==================================================================
-   CREATE EVENT (ONLY ADMIN OR CREATOR)
+   INTERESTED BUTTON  ← MUST BE FIRST
+================================================================== */
+
+app.put("/events/interested/:id", auth, async (req, res) => {
+  try {
+    const userId = req.user.id.toString(); // ✅ force string
+
+    const event = await Event.findById(req.params.id);
+
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    if (!event.interestedUsers) event.interestedUsers = [];
+
+    // ✅ Compare as strings
+    const index = event.interestedUsers.findIndex(
+      (u) => u.toString() === userId
+    );
+
+    if (index !== -1) {
+      event.interestedUsers.splice(index, 1); // remove
+    } else {
+      event.interestedUsers.push(userId); // add
+    }
+
+    await event.save();
+    res.json(event);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+/* ==================================================================
+   CREATE EVENT  (POST /events)
 ================================================================== */
 
 app.post("/events", auth, upload.array("images", 5), async (req, res) => {
   try {
-    if (req.user.role !== "admin" && req.user.role !== "creator") {
-      return res.status(403).json({ message: "You cannot create events" });
-    }
+    console.log("CREATE BODY:", req.body);
+    console.log("CREATE FILES:", req.files);
 
-    const imageNames = req.files.map((file) => file.filename);
+    const images = req.files ? req.files.map((file) => file.filename) : [];
 
     const event = new Event({
-  title: req.body.title,
-  description: req.body.description,
-  category: req.body.category,
-  date: req.body.date,
-  time: req.body.time,
-  location: req.body.location,
-  hostedBy: req.body.hostedBy,   // ✅ ADD THIS
-  lat: req.body.lat,             // ✅ ADD THIS
-  lng: req.body.lng,             // ✅ ADD THIS
-  images: imageNames,
-  creatorId: req.user.id,
-  creatorRole: req.user.role,
-  creatorName: req.user.name,
-  interestedUsers: [],
-});
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      date: req.body.date,
+      time: req.body.time,
+      location: req.body.location,
+      hostedBy: req.body.hostedBy,
+      lat: req.body.lat,
+      lng: req.body.lng,
+      creatorId: req.user.id,
+      images,
+    });
 
     await event.save();
+    res.json({ message: "Event created successfully", event });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+/* ==================================================================
+   EDIT EVENT  ← MUST BE AFTER INTERESTED
+================================================================== */
 
+app.put("/events/:id", auth, upload.array("images", 5), async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
+console.log("FILES:", req.files);
+console.log("USER:", req.user);
+    const event = await Event.findById(req.params.id);
+
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    if (
+      req.user.role !== "admin" &&
+      event.creatorId.toString() !== req.user.id.toString()
+    ) {
+      return res.status(403).json({ message: "You cannot edit this event" });
+    }
+
+    event.title = req.body.title || event.title;
+    event.description = req.body.description || event.description;
+    event.category = req.body.category || event.category;
+    event.date = req.body.date || event.date;
+    event.time = req.body.time || event.time;
+    event.location = req.body.location || event.location;
+    event.hostedBy = req.body.hostedBy || event.hostedBy;
+    event.lat = req.body.lat || event.lat;
+    event.lng = req.body.lng || event.lng;
+
+    if (req.files && req.files.length > 0) {
+      event.images.forEach((img) => {
+        const filePath = `uploads/${img}`;
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      });
+      event.images = req.files.map((file) => file.filename);
+    }
+
+    await event.save();
     res.json(event);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-
 /* ==================================================================
    CREATOR EVENTS
 ================================================================== */
@@ -242,34 +299,6 @@ app.delete("/events/:id", auth, async (req, res) => {
     await Event.findByIdAndDelete(req.params.id);
 
     res.json({ message: "Event deleted" });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-/* ==================================================================
-   INTERESTED BUTTON
-================================================================== */
-
-app.put("/events/interested/:id", auth, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const event = await Event.findById(req.params.id);
-
-    if (!event) return res.status(404).json({ message: "Event not found" });
-
-    if (!event.interestedUsers) event.interestedUsers = [];
-
-    if (event.interestedUsers.includes(userId)) {
-      event.interestedUsers.pull(userId);
-    } else {
-      event.interestedUsers.push(userId);
-    }
-
-    await event.save();
-
-    res.json(event);
   } catch (err) {
     res.status(500).json(err);
   }
