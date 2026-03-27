@@ -191,24 +191,28 @@ app.put("/events/interested/:id", auth, async (req, res) => {
 
 app.post("/events", auth, upload.array("images", 5), async (req, res) => {
   try {
-    console.log("CREATE BODY:", req.body);
-    console.log("CREATE FILES:", req.files);
+    if (req.user.role !== "admin" && req.user.role !== "creator") {
+      return res.status(403).json({ message: "You cannot create events" });
+    }
 
     const images = req.files ? req.files.map((file) => file.filename) : [];
 
     const event = new Event({
-      title: req.body.title,
-      description: req.body.description,
-      category: req.body.category,
-      date: req.body.date,
-      time: req.body.time,
-      location: req.body.location,
-      hostedBy: req.body.hostedBy,
-      lat: req.body.lat,
-      lng: req.body.lng,
-      creatorId: req.user.id,
-      images,
-    });
+  title: req.body.title,
+  description: req.body.description,
+  category: req.body.category,
+  date: req.body.date,
+  time: req.body.time,
+  location: req.body.location,
+  hostedBy: req.body.hostedBy,
+  lat: req.body.lat,
+  lng: req.body.lng,
+  creatorId: req.user.id,
+  creatorRole: req.user.role,   // ✅ ADD THIS
+  creatorName: req.user.name,   // ✅ ADD THIS
+  interestedUsers: [],          // ✅ ADD THIS
+  images,
+});
 
     await event.save();
     res.json({ message: "Event created successfully", event });
