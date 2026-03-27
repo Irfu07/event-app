@@ -17,10 +17,13 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [loadingId, setLoadingId] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
 
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
   const token = localStorage.getItem("token");
+
+  /* ================= FETCH EVENTS ================= */
 
   const fetchEvents = async () => {
     try {
@@ -31,9 +34,43 @@ function Dashboard() {
     }
   };
 
+  /* ================= GET USER LOCATION ================= */
+
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          });
+        },
+        (err) => {
+          console.log("Location denied:", err);
+        }
+      );
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    getUserLocation();
   }, []);
+
+  /* ================= DISTANCE CALCULATOR ================= */
+
+  const getDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLng = (lng2 - lng1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
 
   /* ================= DELETE ================= */
 
@@ -69,13 +106,28 @@ function Dashboard() {
     }
   };
 
-  /* ================= FILTER ================= */
+  /* ================= FILTER + SORT BY DISTANCE ================= */
 
-  const filteredEvents = events.filter(event => {
-    const matchSearch = event.title.toLowerCase().includes(search.toLowerCase());
-    const matchCategory = category === "All" || event.category === category;
-    return matchSearch && matchCategory;
-  });
+  const filteredEvents = events
+    .filter(event => {
+      const matchSearch = event.title.toLowerCase().includes(search.toLowerCase());
+      const matchCategory = category === "All" || event.category === category;
+      return matchSearch && matchCategory;
+    })
+    .sort((a, b) => {
+      if (userLocation && a.lat && a.lng && b.lat && b.lng) {
+        const distA = getDistance(
+          userLocation.lat, userLocation.lng,
+          parseFloat(a.lat), parseFloat(a.lng)
+        );
+        const distB = getDistance(
+          userLocation.lat, userLocation.lng,
+          parseFloat(b.lat), parseFloat(b.lng)
+        );
+        return distA - distB;
+      }
+      return 0;
+    });
 
   /* ================= UI ================= */
 
@@ -83,6 +135,17 @@ function Dashboard() {
     <div className="container">
 
       <h2 className="title">🎉 Nearby Events</h2>
+
+      {/* LOCATION STATUS */}
+      {userLocation ? (
+        <p style={{ textAlign: "center", color: "white", fontSize: "13px", marginBottom: "10px" }}>
+          📍 Showing events nearest to your location
+        </p>
+      ) : (
+        <p style={{ textAlign: "center", color: "rgba(255,255,255,0.7)", fontSize: "13px", marginBottom: "10px" }}>
+          📍 Allow location access to see nearby events first
+        </p>
+      )}
 
       <div className="filters">
         <input
@@ -108,9 +171,17 @@ function Dashboard() {
         {filteredEvents.map(event => {
 
           const isInterested = event.interestedUsers?.some(
-             (u) => u.toString() === userId
-            );
+            (u) => u.toString() === userId
+          );
           const isOwner = event.creatorId === userId || role === "admin";
+
+          // Calculate distance if location available
+          const distance = userLocation && event.lat && event.lng
+            ? getDistance(
+                userLocation.lat, userLocation.lng,
+                parseFloat(event.lat), parseFloat(event.lng)
+              ).toFixed(1)
+            : null;
 
           return (
             <div
@@ -165,6 +236,13 @@ function Dashboard() {
               <p><b>Location:</b> {event.location}</p>
               <p><b>Hosted By:</b> {event.hostedBy || "Not specified"}</p>
 
+              {/* DISTANCE BADGE */}
+              {distance && (
+                <p style={{ color: "#6c63ff", fontSize: "13px", fontWeight: "bold" }}>
+                  📍 {distance} km away
+                </p>
+              )}
+
               <div className="btn-group">
 
                 {/* INTERESTED BUTTON */}
@@ -182,11 +260,11 @@ function Dashboard() {
                   }
                 </button>
 
-                {/* EDIT BUTTON — only for creator or admin */}
+                {/* EDIT BUTTON */}
                 {isOwner && (
                   <button
-                    className="btn btn-primary"
-                    style={{ background: "#f0a500" }}
+                    className="btn"
+                    style={{ background: "#f0a500", color: "white" }}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/edit/${event._id}`);
@@ -196,7 +274,7 @@ function Dashboard() {
                   </button>
                 )}
 
-                {/* DELETE BUTTON — only for creator or admin */}
+                {/* DELETE BUTTON */}
                 {isOwner && (
                   <button
                     className="btn btn-danger"
